@@ -6,8 +6,7 @@ from jwt.exceptions import ExpiredSignatureError
 
 from datetime import datetime, timedelta, timezone
 
-SECRET_KEY = 'WW3RXUHPWHUMI7737WMW6T43CUIP2P4I'
-ALGORITHM = "HS256"
+from app.services.config import SECRET_KEY, ALGORITHM
 
 # JWT time config
 Jason_Web_Token_Exp = {

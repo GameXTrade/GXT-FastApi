@@ -1,9 +1,9 @@
 from app.services.mailer import send_mail, MailBody
 from fastapi import APIRouter, Depends, HTTPException, status, Response
-from app.schemas.user_schema import UserCreate
+from app.schemas.user_schema import User, UserCreate
 from app.database.db import db_dependency
-from app.operations.users import create_user, get_users,delete_user
-
+from app.operations.users import create_user, get_users,delete_user, get_user_by_email
+from app.operations.token import create_token
 
 
 router = APIRouter(
@@ -19,10 +19,21 @@ async def get_all_users(db: db_dependency, skip: int = 0, limit: int = 100):
     return db_user
 
 # POST TEST
-@router.post("", status_code=status.HTTP_201_CREATED)
-async def add_one_user(db: db_dependency, user: UserCreate):
-    db_user = create_user(db, user)
+@router.post("", response_model=User, status_code=status.HTTP_201_CREATED)
+def add_user(db: db_dependency, user: UserCreate):
+    '''Create new user in database'''
+    db_user = get_user_by_email(db, email = user.email)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    db_user = create_user(db=db, user=user)
+
+    token = create_token(db_user.id, db_user.username)
+    
+    send_mail({"to":[db_user.email],"subject":"Verify your email address 🚀","body":token})
     return db_user
+
+
+
 # PUT
 @router.put("/{user_id}")
 async def edite_one_user(user_id:str):

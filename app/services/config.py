@@ -24,6 +24,10 @@ POSTGRESQL_USER_PASSWORD= os.getenv("POSTGRESQL_PWD")
 POSTGRESQL_ACCESS_URL = os.getenv("POSTGRESQL_URL")
 
 
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+
+
 class MailBody(BaseModel):
     to: List[str]
     subject: str
