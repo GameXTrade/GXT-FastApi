@@ -4,7 +4,8 @@ from email.mime.text import MIMEText
 from smtplib import SMTP
 
 def send_mail(data: dict | None = None):
-    URL = f"http://localhost:5173/verify"
+    body = data.get("body", "")
+    URL = f"http://localhost:5173/verify?token={body}"
     msg = f'''
         <div style="border: 2px solid #333; border-radius: 5px; padding: 10px; background-color: #f9f9f9; width: 300px;">
             <p style="font-size: 16px; font-weight: bold; color: #333;">Willkommen zur Registrierung!</p>
