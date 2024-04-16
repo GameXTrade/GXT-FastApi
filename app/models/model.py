@@ -15,7 +15,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     image = Column(String, default="")
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
-    is_active = Column(Boolean, default=False)
+    is_verified = Column(Boolean, default=False)
 
     items = relationship("Item", back_populates="owner")
 

@@ -1,7 +1,7 @@
 import jwt
 
 from fastapi import  HTTPException, Request
-from jwt.exceptions import ExpiredSignatureError
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
 
 from datetime import datetime, timedelta, timezone
@@ -16,6 +16,20 @@ Jason_Web_Token_Exp = {
     "hours": 24
 }
 
+def check_token(token):
+    try:
+        decoded = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token signature")
+    except IndexError:
+        raise HTTPException(status_code=401, detail="Invalid token format")
+    except Exception as e:
+        raise HTTPException(status_code=401, detail="Issue with token: " + str(e))
+    return decoded
+    
+    
 def check(req: Request):
     try:
         token = req.headers.get('Authorization', '').split(" ")[1]

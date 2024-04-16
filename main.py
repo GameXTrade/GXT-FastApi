@@ -15,6 +15,7 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
+
 Base.metadata.create_all(bind = engine)
 
 origins = [
@@ -28,7 +29,7 @@ app.add_middleware(
     allow_credentials =True,
     allow_methods=["*"],
     allow_headers=["*"],
-)
+) 
 
 # # app.include_router(auth_router)
 app.include_router(user_router)

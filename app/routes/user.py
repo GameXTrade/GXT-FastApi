@@ -1,10 +1,11 @@
 from app.services.mailer import send_mail, MailBody
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from app.schemas.user_schema import User, UserCreate
 from app.database.db import db_dependency
-from app.operations.users import create_user, get_users,delete_user, get_user_by_email
-from app.operations.token import create_token
-
+from app.operations.users import create_user, get_users,delete_user, get_user_by_email, verify_user_id
+from app.operations.token import create_token, check_token
+from datetime import datetime, timedelta, timezone
+from pydantic import BaseModel
 
 router = APIRouter(
     prefix="/user", 
@@ -19,19 +20,41 @@ async def get_all_users(db: db_dependency, skip: int = 0, limit: int = 100):
     return db_user
 
 # POST TEST
-@router.post("", response_model=User, status_code=status.HTTP_201_CREATED)
-def add_user(db: db_dependency, user: UserCreate):
+@router.post("", status_code=status.HTTP_201_CREATED)
+async def add_user(db: db_dependency, user: UserCreate, response: Response):
     '''Create new user in database'''
     db_user = get_user_by_email(db, email = user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    db_user = create_user(db=db, user=user)
+    db_user = create_user(db, user)
 
     token = create_token(db_user.id, db_user.username)
     
-    send_mail({"to":[db_user.email],"subject":"Verify your email address 🚀","body":token})
-    return db_user
+    # response = JSONResponse({"message": "User created successfully"})
+    response.set_cookie(
+        key="jwt",
+        value=token,
+        httponly=True,
+        expires=datetime.now(timezone.utc) + timedelta(hours=24),  # Beispiel: Cookie läuft nach einem Tag ab
+        #secure=True,  # Setze auf True, wenn die Verbindung über HTTPS erfolgt
+        #samesite="strict",
 
+    )
+    
+    send_mail({"to":[db_user.email],"subject":"Verify your email address 🚀"})
+    return True
+
+@router.get("/test-cookie")
+async def test(response: Response):
+    response.set_cookie(
+        key="jwt",
+        value="Test-cookie",
+        httponly=True,
+        expires=datetime.now(timezone.utc) + timedelta(hours=24),  # Beispiel: Cookie läuft nach einem Tag ab
+        #secure=True,  # Setze auf True, wenn die Verbindung über HTTPS erfolgt
+        #samesite="strict",
+    )
+    return True 
 
 
 # PUT
@@ -50,15 +73,21 @@ async def delete_one_user(db: db_dependency, user_id: int):
         print(f"kein user mit der id: {user_id} gefunden")
     return Response(status_code = status.HTTP_204_NO_CONTENT)
 
-# POST
-# @router.post("", response_model=User)
-# def add_user(user_create: UserCreate, db: Session = Depends(get_db)):
-#     '''Create new user in database'''
-#     db_user = get_user_by_email(db, email = user_create.email)
-#     if db_user:
-#         raise HTTPException(status_code=400, detail = "Email already registered")
-#     db_user = create_user(db, user=user_create)
+class Token(BaseModel):
+    sub: int
+    name: str
+    exp: int
+    class Config:
+        from_attributes = True
 
-#     token = create_token(id = db_user.id, name=db_user.name)
-#     send_mail({"to":[db_user.email],"subject":"Verify your email address 🚀","body":token})
-#     return db_user
+@router.get("/verify-user")
+async def verify_user(db: db_dependency, request: Request):
+    token = request.cookies.get("jwt")
+    decoded_token = check_token(token)
+    if decoded_token:
+        token_model = Token(**decoded_token)
+        user_id = token_model.sub
+        message = verify_user_id(db, user_id)
+        return {"token":decoded_token, "code": message.code}
+    
+    return False
