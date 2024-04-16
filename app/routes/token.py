@@ -3,8 +3,12 @@ import jwt
 from jwt.exceptions import ExpiredSignatureError
 
 from app.operations.users import get_user
+from app.operations.token import create_token
+from app.services.mailer import send_mail
 from sqlalchemy.orm import Session
 from app.database.db import get_db
+
+from app.database.db import db_dependency
 
 router = APIRouter(
     prefix="/token", 
@@ -33,6 +37,10 @@ def test_token(verify: bool = Depends(check)):
     return verify
 
 @router.get("/refresh/{user_id}")
-def refresh_token(user_id: int, db: Session = Depends(get_db)):
+async def refresh_token(db: db_dependency, user_id: int):
     user = get_user(db, user_id)
-    return user.id, user.name
+    
+    token = create_token(user.id, user.username)
+    
+    send_mail({"to":[user.email],"subject":"Verify your email address 🚀","body":token})
+    return f"Neuen token an {user} erfolgreich gesendet"

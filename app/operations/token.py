@@ -12,8 +12,8 @@ from app.services.config import SECRET_KEY, ALGORITHM
 Jason_Web_Token_Exp = {
     # timdedelta lib attr. 
     "seconds": 0,
-    "minutes": 60,
-    "hours": 0
+    "minutes": 0,
+    "hours": 24
 }
 
 def check(req: Request):
