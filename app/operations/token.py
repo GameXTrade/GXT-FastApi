@@ -27,12 +27,13 @@ def check_token(token):
         raise HTTPException(status_code=401, detail="Invalid token format")
     except Exception as e:
         raise HTTPException(status_code=401, detail="Issue with token: " + str(e))
-    return decoded
+    return True
     
     
-def check(req: Request):
+def check_request_token(req: Request):
+   
+    token = req.cookies.get("jwt")
     try:
-        token = req.headers.get('Authorization', '').split(" ")[1]
         jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     except KeyError:
         raise HTTPException(status_code=401, detail="Authorization header missing")
@@ -45,10 +46,11 @@ def check(req: Request):
     return True
 
 
-def create_token(id:str, name:str):
+def create_token(id:str, name:str, is_verified:bool):
     payload_data = { 
         "sub": id,
         "name": name,
+        "is_verified": is_verified,
         "exp": datetime.now(timezone.utc) + timedelta(**Jason_Web_Token_Exp)
     }
 

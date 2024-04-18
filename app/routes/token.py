@@ -8,6 +8,9 @@ from app.services.mailer import send_mail
 from sqlalchemy.orm import Session
 from app.database.db import get_db
 
+from app.operations.token import check_token, check_request_token
+
+
 from app.database.db import db_dependency
 
 router = APIRouter(
@@ -18,22 +21,10 @@ router = APIRouter(
 SECRET_KEY = 'WW3RXUHPWHUMI7737WMW6T43CUIP2P4I'
 ALGORITHM = "HS256"
 
-def check(req: Request):
-    try:
-        token = req.headers.get('Authorization', '').split(" ")[1]
-        jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    except KeyError:
-        raise HTTPException(status_code=401, detail="Authorization header missing")
-    except IndexError:
-        raise HTTPException(status_code=401, detail="Invalid token format")
-    except ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token has expired")
-    except Exception as e:
-        raise HTTPException(status_code=401, detail="Issue with token: " + str(e))
-    return True
+
 
 @router.get("")
-def test_token(verify: bool = Depends(check)):
+def test_token(verify: bool = Depends(check_request_token)):
     return verify
 
 @router.get("/refresh/{user_id}")
