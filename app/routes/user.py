@@ -111,7 +111,7 @@ async def edite_one_user(user_id:str, verify: bool = Depends(check_request_token
 
 # DELETE ONE url/user/{user_id}
 @router.delete("/{user_id}", status_code = status.HTTP_204_NO_CONTENT)
-async def delete_one_user(db: db_dependency, user_id: int):
+async def delete_one_user(db: db_dependency, user_id: int, verify: bool = Depends(check_request_token)):
     db_user = delete_user(db, user_id)
     if db_user:
         print(f"db_user mit der id: {user_id} erfolgreich gelöscht")

@@ -45,9 +45,13 @@ class Item(Base):
     __tablename__ = "items"
     
     item_id = Column(Integer, primary_key=True)
+
     name = Column(String, unique=True)
-    description = Column(String, index=True)
+    imagelink = Column(String)
+    description = Column(String)
+    # Link zu was? download oder kauf?
     link = Column(String)
+    
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 

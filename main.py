@@ -2,7 +2,7 @@
 # # routes
 # from app.routes.item import router as item_router
 from app.routes.user import router as user_router
-from app.routes.mailer import router as mail_route
+# from app.routes.mailer import router as mail_route
 # from app.routes.game import router as game_router
 from app.routes.token import router as token_router
 
@@ -31,9 +31,8 @@ app.add_middleware(
     allow_headers=["*"],
 ) 
 
-# # app.include_router(auth_router)
 app.include_router(user_router)
-app.include_router(mail_route)
+# app.include_router(mail_route)
 # app.include_router(item_router)
 # app.include_router(game_router)
 app.include_router(token_router)
