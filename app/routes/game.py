@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.database.db import get_db
-from app.operations.games import CreateGame, create_game,get_game_by_name, get_games, delete_game
+from database.db import get_db
+from operations.games import CreateGame, create_game,get_game_by_name, get_games, delete_game
 
 router = APIRouter(
     prefix="/game", 

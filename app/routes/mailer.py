@@ -1,5 +1,5 @@
-from app.services.mailer import send_mail
-from app.services.config import MailBody
+from services.mailer import send_mail
+from services.config import MailBody
 from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter(

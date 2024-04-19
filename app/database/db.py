@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from fastapi import Depends
 
 
-from app.services.config import POSTGRESQL_ACCESS_URL
+from services.config import POSTGRESQL_ACCESS_URL
 
 
 

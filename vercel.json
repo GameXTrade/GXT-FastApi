@@ -1,0 +1,12 @@
+{
+    "builds": [{
+        "src": "app/api.py",
+        "use": "@now/python",
+        "config": { "maxLambdaSize": "15mb" }
+        
+    }],
+    "routes":[{
+        "src": "/(.*)",
+        "dest": "app/api.py"
+    }]
+}

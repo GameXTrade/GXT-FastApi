@@ -1,4 +1,4 @@
-from app.models import model
+from models import model
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
