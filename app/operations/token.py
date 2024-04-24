@@ -6,7 +6,7 @@ from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
 from datetime import datetime, timedelta, timezone
 
-from services.config import SECRET_KEY, ALGORITHM
+from app.services.config import SECRET_KEY, ALGORITHM
 
 # JWT time config
 Jason_Web_Token_Exp = {

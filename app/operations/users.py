@@ -1,5 +1,5 @@
-from schemas.user_schema import UserCreate
-from models import model
+from app.schemas.user_schema import UserCreate
+from app.models import model
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 

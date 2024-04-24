@@ -1,9 +1,9 @@
-from services.mailer import send_mail
+from app.services.mailer import send_mail
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
-from schemas.user_schema import UserCreate
-from database.db import db_dependency
-from operations.users import create_user, get_users,delete_user, get_user_by_email, verify_user_id, get_user
-from operations.token import create_token, check_token, check_request_token
+from app.schemas.user_schema import UserCreate
+from app.database.db import db_dependency
+from app.operations.users import create_user, get_users,delete_user, get_user_by_email, verify_user_id, get_user
+from app.operations.token import create_token, check_token, check_request_token
 from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
 

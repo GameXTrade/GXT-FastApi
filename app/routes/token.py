@@ -2,16 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 import jwt
 from jwt.exceptions import ExpiredSignatureError
 
-from operations.users import get_user
-from operations.token import create_token
-from services.mailer import send_mail
+from app.operations.users import get_user
+from app.operations.token import create_token
+from app.services.mailer import send_mail
 from sqlalchemy.orm import Session
-from database.db import get_db
+from app.database.db import get_db
 
-from operations.token import check_token, check_request_token
+from app.operations.token import check_token, check_request_token
 
 
-from database.db import db_dependency
+from app.database.db import db_dependency
 
 router = APIRouter(
     prefix="/token", 
