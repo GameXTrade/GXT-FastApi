@@ -23,8 +23,8 @@ class Token(BaseModel):
 @router.get("/verify-user")
 async def verify_user(db: db_dependency, request: Request):
     token = request.cookies.get("jwt")
-    decoded_token = check_token(token)
-    if decoded_token:
+    is_decoded, decoded_token = check_token(token)
+    if is_decoded:
         token_model = Token(**decoded_token)
         user_id = token_model.sub
         message = verify_user_id(db, user_id)
@@ -44,7 +44,7 @@ class UserEmail(BaseModel):
 
 
 # POST LOGIN url/user/login
-@router.post("/login")
+@router.post("/login") 
 async def login_user(db:db_dependency, user: UserEmail):
     db_user = get_user_by_email(db, email = user.email)
     if not db_user:
@@ -62,7 +62,7 @@ class TokenRequest(BaseModel):
 async def login_user_token(token_request: TokenRequest, response: Response):
     # checkt den token ob er gültig ist
     token = token_request.token
-    decoded_token = check_token(token)
+    _, decoded_token = check_token(token)
   
     response.set_cookie(
         key="jwt",

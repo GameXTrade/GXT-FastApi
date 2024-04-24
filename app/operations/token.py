@@ -27,7 +27,7 @@ def check_token(token):
         raise HTTPException(status_code=401, detail="Invalid token format")
     except Exception as e:
         raise HTTPException(status_code=401, detail="Issue with token: " + str(e))
-    return True
+    return True, decoded
     
     
 def check_request_token(req: Request):
