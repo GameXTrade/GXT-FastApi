@@ -30,6 +30,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 ) 
+@app.get("/",tags=["Server"])
+def index():
+    return "Server is running"
 
 app.include_router(user_router)
 # app.include_router(mail_route)
@@ -38,6 +41,3 @@ app.include_router(user_router)
 app.include_router(token_router)
 
  
-@app.get("/")
-def index():
-    return "Server is running"
