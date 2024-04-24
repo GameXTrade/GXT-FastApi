@@ -23,13 +23,13 @@ origins = [
 ]
 
 # able to communicate with localhost apps
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins = origins,
-    allow_credentials = True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-) 
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins = origins,
+#     allow_credentials = True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# ) 
 @app.get("/",tags=["Server"])
 def index():
     return "Server is running"
