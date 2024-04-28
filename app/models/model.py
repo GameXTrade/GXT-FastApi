@@ -19,39 +19,18 @@ class User(Base):
 
     items = relationship("Item", back_populates="owner")
 
-# class Metin2Items(Base):
-#     __tablename__ = "metin2_items"
-
-#     id = Column(Integer, primary_key=True)
-#     game_id = Column(Integer, ForeignKey("games.id"), nullable=False)
-
-#     description = Column(String, index=True)
-#     link = Column(String)
-
-
-#     item_name = Column(String)
-#     item_type = Column(Integer)
-#     sub_type = Column(Integer)
-#     anti_flag = Column(Integer)
-#     item_wear = Column(Integer)
-
-#     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
-
-#     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-
-    # owner = relationship("User", back_populates="metin2_items")
-
 class Item(Base):
     __tablename__ = "items"
     
     item_id = Column(Integer, primary_key=True)
-
-    name = Column(String, unique=True)
-    imagelink = Column(String)
-    description = Column(String)
-    # Link zu was? download oder kauf?
-    link = Column(String)
     
+    name = Column(String, unique=True)
+    antiflag = Column(Integer)
+    link = Column(String)
+    type = Column(Integer)
+    imagelink = Column(String)
+
+    # description = Column(String)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 

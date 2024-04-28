@@ -18,10 +18,6 @@ router = APIRouter(
     tags=['token']
 )
 
-SECRET_KEY = 'WW3RXUHPWHUMI7737WMW6T43CUIP2P4I'
-ALGORITHM = "HS256"
-
-
 
 @router.get("")
 def test_token(verify: bool = Depends(check_request_token)):

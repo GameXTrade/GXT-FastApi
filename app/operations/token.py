@@ -1,5 +1,5 @@
 import jwt
-
+from pydantic import BaseModel
 from fastapi import  HTTPException, Request
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
@@ -15,6 +15,19 @@ Jason_Web_Token_Exp = {
     "minutes": 0,
     "hours": 24
 }
+
+class TokenRequest(BaseModel):
+    token: str
+    
+class Token(BaseModel):
+    sub: int
+    name: str
+    exp: int
+    is_verified: bool
+    image: str
+    class Config:
+        from_attributes = True
+
 
 def check_token(token):
     try:
@@ -34,7 +47,8 @@ def check_request_token(req: Request):
    
     token = req.cookies.get("jwt")
     try:
-        jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
     except KeyError:
         raise HTTPException(status_code=401, detail="Authorization header missing")
     except IndexError:
@@ -43,14 +57,14 @@ def check_request_token(req: Request):
         raise HTTPException(status_code=401, detail="Token has expired")
     except Exception as e:
         raise HTTPException(status_code=401, detail="Issue with token: " + str(e))
-    return True
 
 
-def create_token(id:str, name:str, is_verified:bool):
+def create_token(id:str, name:str, is_verified:bool, image:str):
     payload_data = { 
         "sub": id,
         "name": name,
         "is_verified": is_verified,
+        "image": image,
         "exp": datetime.now(timezone.utc) + timedelta(**Jason_Web_Token_Exp)
     }
 

@@ -1,24 +1,18 @@
 from app.services.mailer import send_mail
-from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
+from fastapi import APIRouter, HTTPException, status, Response, Request
 from app.schemas.user_schema import UserCreate
 from app.database.db import db_dependency
-from app.operations.users import create_user, get_users,delete_user, get_user_by_email, verify_user_id, get_user
-from app.operations.token import create_token, check_token, check_request_token
+from app.operations.users import create_user, get_users,delete_user, get_user_by_email, verify_user_id
+from app.operations.token import create_token, check_token, Token, TokenRequest
 from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
+from app.operations.auth import authenticate_route
+
 
 router = APIRouter(
     prefix="/user", 
     tags=['user']
 )
-
-class Token(BaseModel):
-    sub: int
-    name: str
-    exp: int
-    is_verified: bool
-    class Config:
-        from_attributes = True
 
 @router.get("/verify-user")
 async def verify_user(db: db_dependency, request: Request):
@@ -49,7 +43,8 @@ async def verify_user(db: db_dependency, request: Request):
 
 # GET ALL url/user
 @router.get("")
-async def get_first_100_users(db: db_dependency, skip: int = 0, limit: int = 100,  verify: bool = Depends(check_request_token)):
+@authenticate_route
+async def get_first_100_users(db: db_dependency, skip: int = 0, limit: int = 100):
     '''
     Request to database requires valid JWT.
     Returns users.
@@ -90,13 +85,10 @@ async def login_user(db:db_dependency, user: UserEmail):
     db_user = get_user_by_email(db, email = user.email)
     if not db_user:
         raise HTTPException(status_code=400, detail="email error")
-    token = create_token(db_user.id, db_user.username, db_user.is_verified)
+    token = create_token(db_user.id, db_user.username, db_user.is_verified, db_user.image)
     send_mail({"to":[db_user.email],"subject":"Verify your email address 🚀","body":token},template="login")
     return {"token":"", "code": "Check your email inbox."}
 
-
-class TokenRequest(BaseModel):
-    token: str
 
 # url/user/login-user
 @router.post("/login-user")
@@ -149,7 +141,7 @@ async def add_user(db: db_dependency, user: UserCreate, response: Response):
         raise HTTPException(status_code=400, detail="not allowed to use this email")
     db_user = create_user(db, user)
 
-    token = create_token(db_user.id, db_user.username, db_user.is_verified)
+    token = create_token(db_user.id, db_user.username, db_user.is_verified, db_user.image)
     
     # response = JSONResponse({"message": "User created successfully"})
     response.set_cookie(
@@ -168,7 +160,8 @@ async def add_user(db: db_dependency, user: UserCreate, response: Response):
 
 # PUT url/user/{user_id}
 @router.put("/{user_id}")
-async def edite_one_user(user_id:str, verify: bool = Depends(check_request_token)):
+@authenticate_route
+async def edite_one_user(user_id:str):
     '''
     Updates a user's data based on their ID.
     
@@ -184,7 +177,8 @@ async def edite_one_user(user_id:str, verify: bool = Depends(check_request_token
 
 # DELETE ONE url/user/{user_id}
 @router.delete("/{user_id}", status_code = status.HTTP_204_NO_CONTENT)
-async def delete_one_user(db: db_dependency, user_id: int, verify: bool = Depends(check_request_token)):
+@authenticate_route
+async def delete_one_user(db: db_dependency, user_id: int):
     '''
     Deletes a user from the database based on their ID.
     
