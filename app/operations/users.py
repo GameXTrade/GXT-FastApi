@@ -2,8 +2,7 @@ from app.schemas.user_schema import UserCreate
 from app.models import model
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-
-
+from app.operations.auth import generate_hash_password
 
 # GET USER
 
@@ -19,7 +18,8 @@ def get_users(db:Session, skip: int = 0, limit: int = 100):
 
 # CREATE USER
 def create_user(db:Session, user: UserCreate): 
-    db_user = model.User(username = user.username, email = user.email, image = user.image)
+    hashpassword = generate_hash_password(user.password)
+    db_user = model.User(username = user.username, email = user.email, image = user.image, hashedpassword = hashpassword)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

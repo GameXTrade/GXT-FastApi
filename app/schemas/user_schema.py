@@ -1,11 +1,16 @@
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr
 
 
 class UserBase(BaseModel):
-    username: str = Field(..., description="Name field is required")
-    email: str = Field(..., description="Email field is required")
-    image: Optional[str] = Field(None, description="Optional image field")
+    username: str
+    email: EmailStr
+    password: str
+    image: str = ""
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
 
 class UserCreate(UserBase):
     ...

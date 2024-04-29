@@ -1,5 +1,5 @@
 from app.services.mailer import send_mail
-from fastapi import APIRouter, HTTPException, status, Response, Request
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from app.schemas.user_schema import UserCreate
 from app.database.db import db_dependency
 from app.operations.users import create_user, get_users,delete_user, get_user_by_email, verify_user_id
@@ -8,11 +8,13 @@ from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
 from app.operations.auth import authenticate_route
 
-
 router = APIRouter(
     prefix="/user", 
     tags=['user']
 )
+
+
+
 
 @router.get("/verify-user")
 async def verify_user(db: db_dependency, request: Request):

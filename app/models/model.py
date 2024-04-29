@@ -13,6 +13,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String)
     email = Column(String, unique=True, index=True)
+    hashedpassword = Column(String)
     image = Column(String, default="")
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
     is_verified = Column(Boolean, default=False)
