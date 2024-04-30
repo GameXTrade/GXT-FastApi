@@ -17,10 +17,10 @@ async def test_item(db: db_dependency, item: ItemCreate, token_data: Token = Dep
     token_payload = Token(**token_data) 
     # print(token_payload)
     db_item = create_item(db, item , user_id= token_payload.sub)
-    print(db_item)
+    print(db_item, "create")
     return db_item
 
 @router.get("")
-async def test_item(db: db_dependency, skip: int = 0, limit: int = 100, token_data: Token = Depends(check_request_token)):
-    db_items = get_items_by_user_id(db, token_data["sub"], skip, limit)
+async def test_items(db: db_dependency, skip: int = 0, limit: int = 100, token_data: Token = Depends(check_request_token)):
+    db_items = get_items_by_user_id(db, user_id=token_data["sub"], skip=skip, limit=limit)
     return db_items

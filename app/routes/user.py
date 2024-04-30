@@ -6,15 +6,13 @@ from app.operations.users import create_user, get_users,delete_user, get_user_by
 from app.operations.token import create_token, check_token, Token, TokenRequest
 from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
-from app.operations.auth import authenticate_route
+from app.operations.auth import authenticate_route, verify_password
+
 
 router = APIRouter(
     prefix="/user", 
     tags=['user']
 )
-
-
-
 
 @router.get("/verify-user")
 async def verify_user(db: db_dependency, request: Request):
@@ -64,13 +62,14 @@ async def get_first_100_users(db: db_dependency, skip: int = 0, limit: int = 100
     return db_users
 
 
-class UserEmail(BaseModel):
+class UserCredentials(BaseModel):
     email: str
+    password: str
 
 
 # POST LOGIN url/user/login
 @router.post("/login") 
-async def login_user(db:db_dependency, user: UserEmail):
+async def login_user(db:db_dependency, user: UserCredentials, response: Response):
     '''
     Authenticates a user based on their email address.
     
@@ -87,38 +86,23 @@ async def login_user(db:db_dependency, user: UserEmail):
     db_user = get_user_by_email(db, email = user.email)
     if not db_user:
         raise HTTPException(status_code=400, detail="email error")
-    token = create_token(db_user.id, db_user.username, db_user.is_verified, db_user.image)
-    send_mail({"to":[db_user.email],"subject":"Verify your email address 🚀","body":token},template="login")
-    return {"token":"", "code": "Check your email inbox."}
-
-
-# url/user/login-user
-@router.post("/login-user")
-async def login_user_token(token_request: TokenRequest, response: Response):
-    '''
-    Authenticates a user based on a JWT token.
+    else:
+        if verify_password(user.password, db_user.hashedpassword):
+            token = create_token(db_user.id, db_user.username, db_user.is_verified, db_user.image)
     
-    Parameters:
-    - token_request: An object containing the JWT token to be verified.
-    - response: Response object used to set the HTTP-only cookie with the JWT.
-
-    Returns:
-    - If the provided JWT token is valid:
-        {'token': decoded_token, 'code': 'login succeed'}
-    '''
-    token = token_request.token
-    _, decoded_token = check_token(token)
-  
-    response.set_cookie(
-        key="jwt",
-        value=token,
-        httponly=True,
-        expires=datetime.now(timezone.utc) + timedelta(hours=24),  # Beispiel: Cookie läuft nach einem Tag ab
-        #secure=True,  # Setze auf True, wenn die Verbindung über HTTPS erfolgt
-        #samesite="strict",
-    )
-    return {"token":decoded_token, "code": "login succeed"}
-    
+            # response = JSONResponse({"message": "User created successfully"})
+            response.set_cookie(
+                key="jwt",
+                value=token,
+                httponly=True,
+                expires=datetime.now(timezone.utc) + timedelta(hours=24),  # Beispiel: Cookie läuft nach einem Tag ab
+                #secure=True,  # Setze auf True, wenn die Verbindung über HTTPS erfolgt
+                #samesite="strict",
+            )
+            _, decoded_token = check_token(token)
+        else:
+            raise HTTPException(status_code=400, detail="login failed")
+    return {"token": decoded_token, "code": "login succeed."}
 
 
 # POST url/user

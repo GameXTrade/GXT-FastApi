@@ -9,7 +9,7 @@ md5_crypt_context = CryptContext(schemes=[ "md5_crypt"])
 def generate_hash_password(password):
     return md5_crypt_context.hash(password)
 
-def verify_password(plain, hashed):
+def verify_password(plain, hashed) -> bool:
     return md5_crypt_context.verify(plain, hashed)
 
 
