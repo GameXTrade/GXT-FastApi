@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from app.operations.token import Token, check_request_token
 from app.schemas.item_schema import ItemCreate
 from app.operations.auth import authenticate_route
-from app.operations.items import create_item, get_items_by_user_id
+from app.operations.items import create_item, get_items_by_user_id, get_all_items
 from app.database.db import db_dependency
 
 
@@ -11,6 +11,11 @@ router = APIRouter(
     prefix="/item", 
     tags=['item']
 )
+
+@router.post("/all")
+async def get_items(db: db_dependency, skip: int = 0, limit: int = 100):
+    db_items = get_all_items(db, skip, limit)
+    return db_items
 
 @router.post("/create")
 async def test_item(db: db_dependency, item: ItemCreate, token_data: Token = Depends(check_request_token)):
