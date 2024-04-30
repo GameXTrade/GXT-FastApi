@@ -14,6 +14,7 @@ router = APIRouter(
     tags=['user']
 )
 
+# not finished
 @router.get("/verify-user")
 async def verify_user(db: db_dependency, request: Request):
     '''
@@ -53,7 +54,7 @@ async def get_first_100_users(db: db_dependency, skip: int = 0, limit: int = 100
     - db: Database connection provided by db_dependency.
     - skip: Number of records to skip. Default is 0.
     - limit: Maximum number of records to return. Default is 100.
-    - verify: Boolean value provided by check_request_token dependency indicating whether JWT is verified.
+    # - verify: Boolean value provided by check_request_token dependency indicating whether JWT is verified.
 
     Returns:
     - List of user records from the database.
@@ -71,17 +72,18 @@ class UserCredentials(BaseModel):
 @router.post("/login") 
 async def login_user(db:db_dependency, user: UserCredentials, response: Response):
     '''
-    Authenticates a user based on their email address.
+    Logs in a user and returns a JWT token for authentication.
     
     Parameters:
     - db: Database connection provided by db_dependency.
-    - user: An object containing the user's email address.
-
+    - user: User credentials including email and password.
+    - response: Response object to set the JWT token as a cookie.
+    
     Returns:
-    - If the user's email address is found in the database:
-        {'token': '', 'code': 'Check your email inbox.'}
-    - Otherwise (if the email address is not found):
-        An HTTP error with status code 400 and detail message "email error".
+    - Dictionary containing the JWT token and a success message if login is successful.
+    
+    Raises:
+    - HTTPException(400): If the email does not exist in the database or if the password is incorrect.
     '''
     db_user = get_user_by_email(db, email = user.email)
     if not db_user:
