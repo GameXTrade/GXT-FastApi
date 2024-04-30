@@ -12,7 +12,7 @@ router = APIRouter(
     tags=['item']
 )
 
-@router.post("/all")
+@router.get("/all")
 async def get_items(db: db_dependency, skip: int = 0, limit: int = 100):
     db_items = get_all_items(db, skip, limit)
     return db_items
