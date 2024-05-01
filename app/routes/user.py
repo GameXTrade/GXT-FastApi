@@ -130,8 +130,8 @@ async def add_user(db: db_dependency, user: UserCreate, response: Response):
     db_user = create_user(db, user)
 
     token = create_token(db_user.id, db_user.username, db_user.is_verified, db_user.image)
+    _, decoded_token = check_token(token)
     
-    # response = JSONResponse({"message": "User created successfully"})
     response.set_cookie(
         key="jwt",
         value=token,
@@ -142,8 +142,8 @@ async def add_user(db: db_dependency, user: UserCreate, response: Response):
 
     )
     
-    send_mail({"to":[db_user.email],"subject":"Verify your email address 🚀"})
-    return {"token":token, "code": "Verify your email in your email inbox."}
+    # send_mail({"to":[db_user.email],"subject":"Verify your email address 🚀"})
+    return {"token": decoded_token, "code": "register succeed."}
 
 
 # PUT url/user/{user_id}
