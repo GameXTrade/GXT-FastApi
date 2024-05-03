@@ -31,9 +31,12 @@ class Item(Base):
     type = Column(Integer)
     imagelink = Column(String)
 
+
     # description = Column(String)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    
+    activated = Column(Boolean, default=False)
 
     owner = relationship("User", back_populates="items") 
 
