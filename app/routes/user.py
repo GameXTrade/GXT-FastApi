@@ -133,7 +133,7 @@ async def add_user(db: db_dependency, user: UserCreate, response: Response):
     _, decoded_token = check_token(token)
     
     response.set_cookie(
-        key="jwt",
+        key="jwt", 
         value=token,
         httponly=True,
         expires=datetime.now(timezone.utc) + timedelta(hours=24),  # Beispiel: Cookie läuft nach einem Tag ab
