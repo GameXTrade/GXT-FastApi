@@ -89,9 +89,13 @@ async def login_user(db:db_dependency, user: UserCredentials, response: Response
     if not db_user:
         raise HTTPException(status_code=400, detail="email error")
     else:
+        print(db_user)
         if verify_password(user.password, db_user.hashedpassword):
+            print("user verified")
+
             token = create_token(db_user.id, db_user.username, db_user.is_verified, db_user.image)
-    
+
+            print(token, "created token")
             # response = JSONResponse({"message": "User created successfully"})
             response.set_cookie(
                 key="jwt",
@@ -102,6 +106,8 @@ async def login_user(db:db_dependency, user: UserCredentials, response: Response
                 #samesite="strict",
             )
             _, decoded_token = check_token(token)
+            print(decoded_token, "decoded token")
+
         else:
             raise HTTPException(status_code=400, detail="login failed")
     return {"token": decoded_token, "code": "login succeed."}
