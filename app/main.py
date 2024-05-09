@@ -18,18 +18,18 @@ app = FastAPI()
 
 Base.metadata.create_all(bind = engine)
 
-# origins = [
-#     'http://localhost:8080'
-# ]
+origins = [
+    'https://gxt-mu.vercel.app'
+]
 
-# # able to communicate with localhost apps
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins = origins,
-#     allow_credentials = True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# ) 
+# able to communicate with localhost apps
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins = origins,
+    allow_credentials = True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+) 
 @app.get("/",tags=["Server"])
 def index():
     return "Server is running"
