@@ -32,7 +32,7 @@ app.add_middleware(
 ) 
 @app.get("/",tags=["Server"])
 def index():
-    return "Server is running"
+    return {"Server is running": "version 0.1.0"}
 
 app.include_router(user_router)
 # app.include_router(mail_route)
