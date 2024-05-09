@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Numeric
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from sqlalchemy import TIMESTAMP
@@ -31,6 +31,7 @@ class Item(Base):
     type = Column(Integer)
     imagelink = Column(String)
 
+    price = Column(Numeric(precision=10, scale=2), nullable=False, default=0.00)
 
     # description = Column(String)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())

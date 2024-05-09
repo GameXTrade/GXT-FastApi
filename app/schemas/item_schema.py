@@ -10,6 +10,7 @@ class Item(BaseModel):
     link: str
     type: int
     imagelink: Optional[str] = None
+    price: float
 
 class ItemCreate(Item):
     ...

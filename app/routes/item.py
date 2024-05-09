@@ -15,6 +15,8 @@ router = APIRouter(
 @router.get("/all")
 async def get_items(db: db_dependency, skip: int = 0, limit: int = 100):
     '''
+    Endpoint: /item/all
+
     Retrieves all items from the database.
     
     Parameters:
@@ -29,8 +31,10 @@ async def get_items(db: db_dependency, skip: int = 0, limit: int = 100):
     return db_items
 
 @router.post("/create")
-async def test_item(db: db_dependency, item: ItemCreate, token_data: Token = Depends(check_request_token)):
+async def add_item_to_db(db: db_dependency, item: ItemCreate, token_data: Token = Depends(check_request_token)):
     '''
+    Endpoint: /item/create
+
     Creates a new item in the database associated with the user ID.
     
     Parameters:
@@ -44,12 +48,13 @@ async def test_item(db: db_dependency, item: ItemCreate, token_data: Token = Dep
     token_payload = Token(**token_data) 
     # print(token_payload)
     db_item = create_item(db, item , user_id= token_payload.sub)
-    print(db_item, "create")
     return db_item
 
 @router.get("")
-async def test_items(db: db_dependency, skip: int = 0, limit: int = 100, token_data: Token = Depends(check_request_token)):
+async def get_user_items(db: db_dependency, skip: int = 0, limit: int = 100, token_data: Token = Depends(check_request_token)):
     '''
+    Endpoint: /item
+
     Retrieves items associated with the user ID from the database.
     
     Parameters:
