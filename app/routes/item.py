@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from app.operations.token import Token, check_request_token
 from app.schemas.item_schema import ItemCreate
 from app.operations.auth import authenticate_route
@@ -31,6 +31,7 @@ async def get_items(db: db_dependency, skip: int = 0, limit: int = 100):
     return db_items
 
 @router.post("/create")
+# async def add_item_to_db(db: db_dependency, item: ItemCreate):
 async def add_item_to_db(db: db_dependency, item: ItemCreate, token_data: Token = Depends(check_request_token)):
     '''
     Endpoint: /item/create
@@ -50,8 +51,13 @@ async def add_item_to_db(db: db_dependency, item: ItemCreate, token_data: Token 
     db_item = create_item(db, item , user_id= token_payload.sub)
     return db_item
 
+
+
+
+
 @router.get("")
 async def get_user_items(db: db_dependency, skip: int = 0, limit: int = 100, token_data: Token = Depends(check_request_token)):
+# async def get_user_items(request: Request, db: db_dependency, skip: int = 0, limit: int = 100):
     '''
     Endpoint: /item
 
@@ -66,5 +72,7 @@ async def get_user_items(db: db_dependency, skip: int = 0, limit: int = 100, tok
     Returns:
     - List of items from the database associated with the user ID.
     '''
+
+    # print(request.cookies.get("jwt"))
     db_items = get_items_by_user_id(db, user_id=token_data["sub"], skip=skip, limit=limit)
     return db_items

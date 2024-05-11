@@ -44,7 +44,6 @@ def check_token(token):
     
     
 def check_request_token(req: Request):
-   
     token = req.cookies.get("jwt")
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
