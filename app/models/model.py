@@ -29,6 +29,7 @@ class Item(Base):
     antiflag = Column(Integer)
     link = Column(String)
     type = Column(Integer)
+    wearable = Column(Integer)
     imagelink = Column(String)
 
     price = Column(Numeric(precision=10, scale=2), nullable=False, default=0.00)

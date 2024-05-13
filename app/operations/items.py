@@ -22,7 +22,7 @@ def get_all_items(db:Session,skip: int = 0, limit: int = 100):
 
 def create_item(db:Session, item: ItemCreate, user_id: int): 
     db_item = model.Item(name = item.name, antiflag = item.antiflag, link= item.link, 
-                         type = item.type, imagelink = item.imagelink, owner_id = user_id, price = item.price)
+                         type = item.type, imagelink = item.imagelink, owner_id = user_id, price = item.price, wearable = item.wearable)
     db.add(db_item)
     db.commit()
     db.refresh(db_item)

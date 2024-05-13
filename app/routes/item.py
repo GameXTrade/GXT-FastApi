@@ -47,7 +47,8 @@ async def add_item_to_db(db: db_dependency, item: ItemCreate, token_data: Token 
     - The newly created item.
     '''
     token_payload = Token(**token_data) 
-    # print(token_payload)
+    print(item)
+ 
     db_item = create_item(db, item , user_id= token_payload.sub)
     return db_item
 
@@ -57,7 +58,6 @@ async def add_item_to_db(db: db_dependency, item: ItemCreate, token_data: Token 
 
 @router.get("")
 async def get_user_items(db: db_dependency, skip: int = 0, limit: int = 100, token_data: Token = Depends(check_request_token)):
-# async def get_user_items(request: Request, db: db_dependency, skip: int = 0, limit: int = 100):
     '''
     Endpoint: /item
 
@@ -73,6 +73,5 @@ async def get_user_items(db: db_dependency, skip: int = 0, limit: int = 100, tok
     - List of items from the database associated with the user ID.
     '''
 
-    # print(request.cookies.get("jwt"))
     db_items = get_items_by_user_id(db, user_id=token_data["sub"], skip=skip, limit=limit)
     return db_items
