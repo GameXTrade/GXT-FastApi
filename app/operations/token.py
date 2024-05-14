@@ -52,8 +52,10 @@ def check_request_token(req: Request):
         raise HTTPException(status_code=401, detail="Authorization header missing")
     except IndexError:
         raise HTTPException(status_code=401, detail="Invalid token format")
-    except ExpiredSignatureError:
+    except ExpiredSignatureError: # <- tritt nie in kraft weil vorher automatisch vom browser gelöscht wird
         raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token type")
     except Exception as e:
         raise HTTPException(status_code=401, detail="Issue with token: " + str(e))
 
