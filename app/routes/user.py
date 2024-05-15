@@ -99,8 +99,8 @@ async def login_user(db:db_dependency, user: UserCredentials, response: Response
                 value=token,
                 httponly=True,
                 expires=datetime.now(timezone.utc) + timedelta(hours=24),  # Beispiel: Cookie läuft nach einem Tag ab
-                #secure=True,  # Setze auf True, wenn die Verbindung über HTTPS erfolgt
-                #samesite="strict",
+                secure=True,  # Setze auf True, wenn die Verbindung über HTTPS erfolgt
+                samesite="None",
             )
             _, decoded_token = check_token(token)
 
