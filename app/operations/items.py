@@ -1,11 +1,15 @@
 from app.schemas.item_schema import ItemCreate
 from app.models import model
 from sqlalchemy.orm import Session
-
+from sqlalchemy import desc
 
 
 def get_items_by_user_id(db:Session, user_id: int, skip: int = 0, limit: int = 100):   
     return db.query(model.Item).filter(model.Item.owner_id == user_id).offset(skip).limit(limit).all()
+
+def get_10_recently_added_items(db:Session):
+    # Sortiere die Elemente nach dem Erstellungsdatum in absteigender Reihenfolge und wähle die ersten 10 aus
+    return db.query(model.Item).order_by(desc(model.Item.created_at)).limit(10).all()
 
 def get_all_items(db:Session,skip: int = 0, limit: int = 100):
     query = db.query(model.Item, model.User.username).\
