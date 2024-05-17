@@ -11,39 +11,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/fastapi-app:latest
-        build-args: |
-          POSTGRESQL_URL_VAR=${{ secrets.POSTGRESQL_URL }}
-          SECRET_KEY_VAR=${{ secrets.SECRET_KEY }}
-          EMAIL_HOST_USER_VAR=${{ secrets.EMAIL_HOST_USER }}
-          EMAIL_HOST_PASSWORD_VAR=${{ secrets.EMAIL_HOST_PASSWORD }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/fastapi-app:latest
+          build-args: |
+            POSTGRESQL_URL_VAR=${{ secrets.POSTGRESQL_URL }}
+            SECRET_KEY_VAR=${{ secrets.SECRET_KEY }}
+            EMAIL_HOST_USER_VAR=${{ secrets.EMAIL_HOST_USER }}
+            EMAIL_HOST_PASSWORD_VAR=${{ secrets.EMAIL_HOST_PASSWORD }}
 
-    - name: SSH to Server and Update Docker Container
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        port: 22
-        script: |
-          cd ${{ secrets.WORK_DIR }}
-          docker compose down
-          docker rmi ${{ secrets.DOCKER_USERNAME }}/fastapi-app:latest
-          docker pull ${{ secrets.DOCKER_USERNAME }}/fastapi-app:latest
-          docker compose up -d
-    - name: cleanup
-      run: rm -rf ~/.ssh
+      - name: SSH to Server and Update Docker Container
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd ${{ secrets.WORK_DIR }}
+            docker compose down
+            docker rmi ${{ secrets.DOCKER_USERNAME }}/fastapi-app:latest
+            docker pull ${{ secrets.DOCKER_USERNAME }}/fastapi-app:latest
+            docker compose up -d
+      - name: cleanup
+        run: rm -rf ~/.ssh
