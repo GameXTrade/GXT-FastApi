@@ -34,3 +34,17 @@ jobs:
           SECRET_KEY_VAR=${{ secrets.SECRET_KEY }}
           EMAIL_HOST_USER_VAR=${{ secrets.EMAIL_HOST_USER }}
           EMAIL_HOST_PASSWORD_VAR=${{ secrets.EMAIL_HOST_PASSWORD }}
+
+    - name: SSH to Server and Update Docker Container
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: 22
+        script: |
+          cd ${{ secrets.WORK_DIR }}
+          docker-compose down
+          docker rmi ${{ secrets.DOCKER_USERNAME }}/fastapi-app:latest
+          docker pull ${{ secrets.DOCKER_USERNAME }}/fastapi-app:latest
+          docker-compose up -d
