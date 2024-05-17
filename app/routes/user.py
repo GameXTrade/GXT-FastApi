@@ -117,7 +117,7 @@ async def add_user(db: db_dependency, user: UserCreate, response: Response):
     Returns:
     - dict: Dictionary containing authentication token and message.
     """
-    db_user = get_user_by_email(db, email = user.email)
+    db_user = await get_user_by_email(db, email = user.email)
     if db_user: # User email existiert bereits
         raise HTTPException(status_code=400, detail="not allowed to use this email")
     db_user = create_user(db, user)

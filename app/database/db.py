@@ -4,10 +4,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
 from fastapi import Depends
 
-
 from app.services.config import POSTGRESQL_ACCESS_URL
-
-
 
 engine = create_engine(POSTGRESQL_ACCESS_URL)
 

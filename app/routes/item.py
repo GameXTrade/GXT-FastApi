@@ -28,12 +28,12 @@ async def get_items(db: db_dependency, skip: int = 0, limit: int = 100):
     Returns:
     - List of all items from the database.
     '''
-    db_items = get_all_items(db, skip, limit)
+    db_items = await get_all_items(db, skip, limit)
     return db_items
 
 @router.get("/recent")
 async def ten_recently_added_items(db: db_dependency):
-    return get_10_recently_added_items(db)
+    return await get_10_recently_added_items(db)
 
 
 @router.post("/create")
@@ -82,5 +82,5 @@ async def get_user_items(
     Returns:
     - List[Item]: List of items associated with the authenticated user.
     """
-    db_items = get_items_by_user_id(db, user_id=token_data["sub"], skip=skip, limit=limit)
+    db_items = await get_items_by_user_id(db, user_id=token_data["sub"], skip=skip, limit=limit)
     return db_items
