@@ -3,6 +3,10 @@ FROM python:3.12-slim
 
 WORKDIR /code
 
+COPY ./requirements.txt /code/requirements.txt
+
+RUN pip install --no-cache-dir --upgrade pip -r /code/requirements.txt
+
 ARG POSTGRESQL_URL_VAR
 ARG SECRET_KEY_VAR
 ARG EMAIL_HOST_USER_VAR
@@ -13,11 +17,6 @@ ENV POSTGRESQL_URL=$POSTGRESQL_URL_VAR\
     EMAIL_HOST_USER=$EMAIL_HOST_USER_VAR \
     EMAIL_HOST_PASSWORD=$EMAIL_HOST_PASSWORD_VAR
 
-
-COPY ./requirements.txt /code/requirements.txt
-
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir psycopg2-binary
 
 COPY ./app /code/app
 
