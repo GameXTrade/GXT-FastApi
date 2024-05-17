@@ -42,7 +42,7 @@ jobs:
 
       - name: SSH to Server and Update Docker Container
         uses: appleboy/ssh-action@master
-        with:
+        with: 
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
