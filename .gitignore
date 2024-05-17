@@ -7,6 +7,3 @@ venv/
 # Ignore all pycached folder
 __pycache__/
 .vercel
-
-# Ignore Dockerfile, because sensitife data in environment
-Dockerfile
