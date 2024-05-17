@@ -16,7 +16,9 @@ ENV POSTGRESQL_URL=$POSTGRESQL_URL_VAR\
 
 COPY ./requirements.txt /code/requirements.txt
 
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt psycopg2-binary
+# Install psycopg2-binary instead of psycopg2
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir psycopg2-binary
 
 COPY ./app /code/app
 
