@@ -20,7 +20,7 @@ Base.metadata.create_all(bind = engine)
 
 
 origins = [
-    'https://gxt-mu.vercel.app',
+    'https://gxt-mu.vercel.app', 
     # 'http://localhost:5173',
 ]
 
