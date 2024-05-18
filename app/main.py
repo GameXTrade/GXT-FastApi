@@ -9,14 +9,16 @@ from app.routes.token import router as token_router
 # # database models
 from app.database.db import Base, engine
 
-from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 
 
 app = FastAPI()
 
+Base.metadata.create_all(bind = engine)
+
 origins = [
-    'https://gxt-mu.vercel.app/',  
+    'https://gxt-mu.vercel.app',  
     # 'http://localhost:5173',
 ]
 
@@ -29,7 +31,6 @@ app.add_middleware(
     allow_headers=["*"],
 ) 
 
-Base.metadata.create_all(bind = engine)
 
 
 app.include_router(user_router)

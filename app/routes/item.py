@@ -60,10 +60,6 @@ async def add_item_to_db(
     db_item = create_item(db, item , user_id= token_payload.sub)
     return db_item
 
-
-
-
-
 @router.get("")
 async def get_user_items(
     db: db_dependency, 
