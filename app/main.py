@@ -15,12 +15,8 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-
-Base.metadata.create_all(bind = engine)
-
-
 origins = [
-    'https://gxt-mu.vercel.app',  
+    'https://gxt-mu.vercel.app/',  
     # 'http://localhost:5173',
 ]
 
@@ -32,9 +28,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 ) 
-@app.get("/",tags=["Server"])
-def index():
-    return {"Server is running": "version 0.1.0"}
+
+Base.metadata.create_all(bind = engine)
+
 
 app.include_router(user_router)
 # app.include_router(mail_route)
@@ -42,4 +38,8 @@ app.include_router(item_router)
 # app.include_router(game_router)
 app.include_router(token_router)
 
+
+@app.get("/",tags=["Server"])
+def index():
+    return {"Server is running": "version 0.1.0"}
  
