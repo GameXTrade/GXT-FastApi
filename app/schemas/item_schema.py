@@ -13,5 +13,7 @@ class Item(BaseModel):
     wearable: int
     price: float
 
+    download_count: int
+
 class ItemCreate(Item):
     ...

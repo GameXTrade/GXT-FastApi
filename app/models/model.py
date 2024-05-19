@@ -34,6 +34,8 @@ class Item(Base):
 
     price = Column(Numeric(precision=10, scale=2), nullable=False, default=0.00)
 
+    download_count = Column(Integer, default = 0)
+
     # description = Column(String)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
