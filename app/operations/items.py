@@ -20,6 +20,7 @@ def get_10_recently_added_items(db:Session):
     """
     query = db.query(model.Item, model.User.username).\
             join(model.User, model.Item.owner_id == model.User.id).\
+            filter(model.Item.activated == True).\
             order_by(desc(model.Item.created_at)).limit(10).all()
     results = []
     for item, username in query:
