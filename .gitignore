@@ -6,4 +6,6 @@ venv/
 
 # Ignore all pycached folder
 __pycache__/
-.vercel
+
+
+docker-compose.yml

@@ -7,8 +7,8 @@ from pydantic import BaseModel
 load_dotenv()
 
 # localhost Postgres
-__POSTGRESQL_USER = 'postgres'
-__POSTGRESQL_PWD = 'Rq9$T7W'
+# __POSTGRESQL_USER = 'postgres'
+# __POSTGRESQL_PWD = 'mysecretpassword'#'Rq9$T7W'
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
@@ -17,21 +17,17 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 # Postgres Host
-POSTGRESQL_USER = os.getenv("POSTGRESQL_USER")
-POSTGRESQL_USER_PASSWORD= os.getenv("POSTGRESQL_PWD")
+# POSTGRESQL_USER = os.getenv("POSTGRESQL_USER")
+# POSTGRESQL_USER_PASSWORD= os.getenv("POSTGRESQL_PWD")
 
 
-POSTGRESQL_PORT = 5432
+# POSTGRESQL_PORT = 5433
 
 
-TEST_MODE = False
+POSTGRESQL_ACCESS_URL = os.getenv("DATABASE_URL")
 
-if TEST_MODE:
-    POSTGRESQL_ACCESS_URL = f"postgresql://{__POSTGRESQL_USER}:{__POSTGRESQL_PWD}@localhost:{POSTGRESQL_PORT}/fastapi"
-else:
-    POSTGRESQL_ACCESS_URL = os.getenv("POSTGRESQL_URL")
+print("DATABASE URL: ", POSTGRESQL_ACCESS_URL)
 
-print("TEST_MODE: ", TEST_MODE)
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = 'HS256'

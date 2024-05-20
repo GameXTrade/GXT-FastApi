@@ -47,7 +47,7 @@ def create_item(db:Session, item: ItemCreate, user_id: int):
         name = item.name, antiflag = item.antiflag, 
         link= item.link, type = item.type, imagelink = item.imagelink, 
         owner_id = user_id, price = item.price, wearable = item.wearable,
-        download_count=0
+        download_count = 0
     )
     db.add(db_item)
     db.commit()
