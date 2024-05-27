@@ -9,3 +9,6 @@ __pycache__/
 
 
 docker-compose.yml
+
+# Ausschließen der Datei service_account.json im Verzeichnis app/factory
+app/factory/service_account.json

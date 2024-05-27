@@ -1,11 +1,15 @@
 from services.mailer import send_mail
-from services.config import MailBody
 from fastapi import APIRouter, Depends, HTTPException
-
+from typing import List
+from pydantic import BaseModel
 router = APIRouter(
     prefix="/mail", 
     tags=['mail']
 )
+class MailBody(BaseModel):
+    to: List[str]
+    subject: str
+    body: str
 
 # special Ones
 @router.post("/send-email")

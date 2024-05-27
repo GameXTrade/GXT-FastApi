@@ -1,7 +1,5 @@
 import os 
 from dotenv import load_dotenv
-from typing import List
-from pydantic import BaseModel
 
 
 load_dotenv()
@@ -26,16 +24,11 @@ EMAIL_USE_TLS = True
 
 POSTGRESQL_ACCESS_URL = os.getenv("DATABASE_URL")
 
-print("DATABASE URL: ", POSTGRESQL_ACCESS_URL)
-
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = 'HS256'
 
 
-class MailBody(BaseModel):
-    to: List[str]
-    subject: str
-    body: str
+
 
 

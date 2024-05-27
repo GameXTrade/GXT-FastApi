@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Request
 from app.operations.token import Token, check_request_token
 from app.schemas.item_schema import ItemCreate
-from app.operations.items import create_item, get_items_by_user_id, get_all_items, get_10_recently_added_items
+from app.operations.items import create_item, get_items_by_user_id, get_all_items, get_10_recently_added_items, get_item_by_id
 from app.database.db import db_dependency
 
 # only when payload is no used
@@ -14,7 +14,7 @@ router = APIRouter(
 )
 
 @router.get("/all")
-async def get_items(db: db_dependency, skip: int = 0, limit: int = 100):
+async def get_items(db: db_dependency, request: Request, skip: int = 0, limit: int = 100):
     '''
     Endpoint: /item/all
 
@@ -28,13 +28,25 @@ async def get_items(db: db_dependency, skip: int = 0, limit: int = 100):
     Returns:
     - List of all items from the database.
     '''
+    client_host = request.client.host
+    print(client_host)
     db_items = get_all_items(db, skip, limit)
     return db_items
 
 
 @router.get("/recent")
-async def ten_recently_added_items(db: db_dependency):
+async def ten_recently_added_items(db: db_dependency, request: Request):
+    client_host = request.client.host
+    print(client_host)
     return get_10_recently_added_items(db)
+
+@router.get("/{item_id}")
+async def get_item(db: db_dependency, item_id:int, request: Request):
+    client_host = request.client.host
+    item = get_item_by_id(db, item_id)
+    if item is None:
+        return {"error": "Item not found"}
+    return item
 
 
 @router.post("/create")

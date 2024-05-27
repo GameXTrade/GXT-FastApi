@@ -30,6 +30,25 @@ def get_10_recently_added_items(db:Session):
 
     return results
 
+def get_item_by_id(db: Session, item_id: int):
+    # Erstelle die Abfrage und filtere nach der item_id
+    query = db.query(model.Item, model.User.username).\
+        join(model.User, model.Item.owner_id == model.User.id).\
+        filter(model.Item.item_id == item_id)
+    
+    # Hol das erste Ergebnis
+    result = query.first()
+    
+    if result:
+        item, username = result
+        item_dict = item.__dict__.copy()
+        item_dict['owner_name'] = username
+        # Entferne SQLAlchemy-spezifische Attribute
+        item_dict.pop('_sa_instance_state', None)
+        return item_dict
+    
+    return None
+
 def get_all_items(db:Session,skip: int = 0, limit: int = 100):
     query = db.query(model.Item, model.User.username).\
         join(model.User, model.Item.owner_id == model.User.id).\

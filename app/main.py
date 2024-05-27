@@ -5,6 +5,8 @@ from app.routes.user import router as user_router
 # from app.routes.game import router as game_router
 from app.routes.token import router as token_router
 
+
+
 # # database models
 from app.database.db import Base, engine, SessionLocal
 from sqlalchemy.orm import Session
@@ -12,6 +14,11 @@ from sqlalchemy import text
 from starlette.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+from app.factory.upload_google_drive import GoogleDriveFactory
+
+
+from fastapi import UploadFile
+
 
 def reset_sequences(db: Session):
     """
@@ -70,3 +77,12 @@ app.include_router(token_router)
 @app.get("/",tags=["Server"])
 def index():
     return {"Server is running": "version 0.1.0"}
+
+@app.post("/upload")
+async def index(file_upload: UploadFile):
+    save_file = GoogleDriveFactory()
+
+    file_id = save_file.upload_file(file_upload)
+    file_url = save_file.share_file(file_id)
+    print("file_id", file_id, "filename", file_upload.filename, "file_url", file_url)
+    return {"file_id": file_id, "filename": file_upload.filename, "file_url": file_url}
