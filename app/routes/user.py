@@ -28,10 +28,31 @@ router = APIRouter(
     
 #     return False
 
-# GET ALL url/user
+
 @router.get("")
 @authenticate_route
 async def get_first_100_users(db: db_dependency, skip: int = 0, limit: int = 100):
+    """
+    Retrieve the first 100 users.
+
+    This endpoint fetches a list of users from the database with optional pagination. 
+    The endpoint is protected and requires authentication.
+
+    Parameters:
+    - db (db_dependency): The database session.
+    - skip (int, optional): The number of users to skip before starting to collect the result set. Default is 0.
+    - limit (int, optional): The maximum number of users to return. Default is 100.
+
+    Request Example:
+    GET /user?skip=0&limit=100
+
+    Responses:
+    - 200 OK: Returns a list of users.
+    - 401 Unauthorized: If the user is not authenticated.
+
+    Example:
+    GET /user?skip=0&limit=100
+    """
     db_users = get_users(db, skip, limit)
     return db_users
 
