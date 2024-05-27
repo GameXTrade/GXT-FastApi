@@ -22,8 +22,26 @@ from fastapi import UploadFile
 
 def reset_sequences(db: Session):
     """
-    Diese Funktion setzt die Primärschlüssel-Sequenzen auf den maximalen Wert in den entsprechenden Tabellen zurück.
-    Beugt Fehlern wie psycopg2.errors.UniqueViolation vor.
+    Reset database sequences to avoid primary key conflicts.
+
+    This function resets the sequences for specified tables to ensure that the next value used for 
+    the primary key is higher than any existing key. This is useful after a data import or manual 
+    modification of the database where sequences might get out of sync.
+
+    Parameters:
+    - db (Session): The SQLAlchemy session used to execute the database commands.
+
+    Tables and Sequences:
+    - items: Resets the "items_item_id_seq" sequence based on the "item_id" column.
+    - users: Resets the "users_id_seq" sequence based on the "id" column.
+
+    Steps:
+    1. For each table and sequence pair, find the current maximum value in the primary key column.
+    2. If the maximum value is found, restart the sequence with the value higher than this maximum.
+    3. Commit the changes to the database.
+
+    Example:
+    reset_sequences(db)
     """
     tables_and_sequences = [
         ("items", "item_id", "items_item_id_seq"),
@@ -52,7 +70,7 @@ app = FastAPI(lifespan=lifespan)
 
 Base.metadata.create_all(bind = engine)
 
-origins = [
+origins = [ # Setting cors origin
     'https://gxt-mu.vercel.app',  
     'http://localhost:5173',
 ]
@@ -71,18 +89,19 @@ app.include_router(user_router)
 # app.include_router(mail_route)
 app.include_router(item_router)
 # app.include_router(game_router)
-app.include_router(token_router)
+# app.include_router(token_router)
 
 
 @app.get("/",tags=["Server"])
 def index():
     return {"Server is running": "version 0.1.0"}
 
-@app.post("/upload")
-async def index(file_upload: UploadFile):
-    save_file = GoogleDriveFactory()
+# Testing new function for uploading files in the cloud via google python Lib.
+# @app.post("/upload")
+# async def index(file_upload: UploadFile):
+#     save_file = GoogleDriveFactory()
 
-    file_id = save_file.upload_file(file_upload)
-    file_url = save_file.share_file(file_id)
-    print("file_id", file_id, "filename", file_upload.filename, "file_url", file_url)
-    return {"file_id": file_id, "filename": file_upload.filename, "file_url": file_url}
+#     file_id = save_file.upload_file(file_upload)
+#     file_url = save_file.share_file(file_id)
+#     print("file_id", file_id, "filename", file_upload.filename, "file_url", file_url)
+#     return {"file_id": file_id, "filename": file_upload.filename, "file_url": file_url}

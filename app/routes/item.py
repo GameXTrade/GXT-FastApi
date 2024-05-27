@@ -15,19 +15,22 @@ router = APIRouter(
 
 @router.get("/all")
 async def get_items(db: db_dependency, request: Request, skip: int = 0, limit: int = 100):
-    '''
-    Endpoint: /item/all
+    """
+    Retrieve all items.
 
-    Retrieves all items from the database.
-    
+    Fetch all items from the database with optional pagination. This route is useful for retrieving a large list of items.
+
     Parameters:
-    - db: Database connection provided by db_dependency.
-    - skip: Number of records to skip. Default is 0.
-    - limit: Maximum number of records to return. Default is 100.
-    
-    Returns:
-    - List of all items from the database.
-    '''
+    - skip (int, optional): The number of items to skip before starting to collect the result set. Default is 0.
+    - limit (int, optional): The maximum number of items to return. Default is 100.
+
+    Request Example:
+    GET /item/all?skip=0&limit=100
+
+    Responses:
+    - 200 OK: Returns a list of items.
+    - default: An error message if the request fails.
+    """
     client_host = request.client.host
     print(client_host)
     db_items = get_all_items(db, skip, limit)
@@ -36,12 +39,40 @@ async def get_items(db: db_dependency, request: Request, skip: int = 0, limit: i
 
 @router.get("/recent")
 async def ten_recently_added_items(db: db_dependency, request: Request):
+    """
+    Retrieve the 10 most recently added items.
+
+    Fetch the 10 most recently added items from the database. This route is useful for getting the latest items.
+
+    Request Example:
+    GET /item/recent
+
+    Responses:
+    - 200 OK: Returns a list of the 10 most recently added items.
+    - default: An error message if the request fails.
+    """
     client_host = request.client.host
     print(client_host)
     return get_10_recently_added_items(db)
 
 @router.get("/{item_id}")
 async def get_item(db: db_dependency, item_id:int, request: Request):
+    """
+    Retrieve an item by its ID.
+
+    Fetch a single item from the database by its ID. This route is useful for retrieving details of a specific item.
+
+    Parameters:
+    - item_id (int, required): The ID of the item to retrieve.
+
+    Request Example:
+    GET /item/1
+
+    Responses:
+    - 200 OK: Returns the item with the specified ID.
+    - 404 Not Found: If the item with the specified ID does not exist.
+    - default: An error message if the request fails.
+    """
     client_host = request.client.host
     item = get_item_by_id(db, item_id)
     if item is None:
@@ -56,17 +87,26 @@ async def add_item_to_db(
     token_data: Token = Depends(check_request_token)
 ):
     """
-    Endpoint to add an item to the database associated with the authenticated user.
+    Create a new item.
 
-    Args:
-    - item (ItemCreate): Item data including name, description, etc.
-    - db (Session): Database session dependency.
-    - token_data (Token): Token data dependency containing user information.
+    Add a new item to the database. This route requires authentication and the payload for the new item.
 
-    Returns:
-    - Item: The newly created item associated with the authenticated user.
+    Parameters:
+    - item (ItemCreate, required): The data for the new item.
+    - token_data (Token, required): The token data for authentication.
+
+    Request Body Example:
+    {
+      "name": "New Item",
+      "description": "Description of the new item",
+      "price": 100.0
+    }
+
+    Responses:
+    - 201 Created: Returns the created item.
+    - 401 Unauthorized: If the user is not authenticated.
+    - default: An error message if the request fails.
     """
-
     token_payload = Token(**token_data) 
  
     db_item = create_item(db, item , user_id= token_payload.sub)
@@ -80,16 +120,22 @@ async def get_user_items(
     token_data: Token = Depends(check_request_token)
 ):
     """
-    Endpoint to retrieve items associated with the authenticated user.
+    Retrieve items for the authenticated user.
 
-    Args:
-    - db (Session): Database session dependency.
-    - skip (int): Number of items to skip.
-    - limit (int): Maximum number of items to retrieve.
-    - token_data (Token): Token data dependency containing user information.
+    Fetch items from the database that belong to the authenticated user, with optional pagination. This route is useful for users to see their own items.
 
-    Returns:
-    - List[Item]: List of items associated with the authenticated user.
+    Parameters:
+    - skip (int, optional): The number of items to skip before starting to collect the result set. Default is 0.
+    - limit (int, optional): The maximum number of items to return. Default is 100.
+    - token_data (Token, required): The token data for authentication.
+
+    Request Example:
+    GET /item?skip=0&limit=100
+
+    Responses:
+    - 200 OK: Returns a list of the user's items.
+    - 401 Unauthorized: If the user is not authenticated.
+    - default: An error message if the request fails.
     """
     db_items = get_items_by_user_id(db, user_id=token_data["sub"], skip=skip, limit=limit)
     return db_items

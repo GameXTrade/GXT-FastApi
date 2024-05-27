@@ -15,47 +15,23 @@ router = APIRouter(
 )
 
 # not finished
-@router.get("/verify-user")
-async def verify_user(db: db_dependency, request: Request):
-    '''
-    Requires a valid HTTP-only JWT cookie (no token in URL query).
-    Takes JWT, then decodes and verifies user via user ID.
-    
-    Parameters:
-    - db: Database connection provided by db_dependency.
-    - request: Request object used to access the JWT cookie.
+# @router.get("/verify-user")
+# async def verify_user(db: db_dependency, request: Request):
 
-    Returns:
-    - If a valid JWT is found and the user is successfully verified:
-        {'token': decoded_token, 'code': message.code}
-    - Otherwise (if a valid JWT is not found):
-        False
-    '''
-
-    token = request.cookies.get("jwt")
-    is_decoded, decoded_token = check_token(token)
-    if is_decoded:
-        token_model = Token(**decoded_token)
-        user_id = token_model.sub
-        message = verify_user_id(db, user_id)
-        return {"token":decoded_token, "code": message.code}
+#     token = request.cookies.get("jwt")
+#     is_decoded, decoded_token = check_token(token)
+#     if is_decoded:
+#         token_model = Token(**decoded_token)
+#         user_id = token_model.sub
+#         message = verify_user_id(db, user_id)
+#         return {"token":decoded_token, "code": message.code}
     
-    return False
+#     return False
 
 # GET ALL url/user
 @router.get("")
 @authenticate_route
 async def get_first_100_users(db: db_dependency, skip: int = 0, limit: int = 100):
-    """
-    Endpoint to retrieve users from the database.
-
-    Args:
-    - skip (int): Number of records to skip.
-    - limit (int): Maximum number of records to retrieve.
-
-    Returns:
-    - List[UserOut]: List of users retrieved from the database.
-    """
     db_users = get_users(db, skip, limit)
     return db_users
 
@@ -65,19 +41,35 @@ class UserCredentials(BaseModel):
     password: str
 
 
-# POST LOGIN url/user/login
 @router.post("/login") 
 async def login_user(db:db_dependency, user: UserCredentials, response: Response):
     """
-    Endpoint to authenticate a user and generate a JWT token for login.
+    Authenticate a user and issue a JWT token.
 
-    Args:
-    - user (UserCredentials): User credentials including email and password.
-    - response (Response): FastAPI Response object to set cookie.
-    - db (Session): Database session dependency.
+    This endpoint allows a user to log in by providing their email and password. If the credentials are correct, 
+    a JWT token is issued and set as an HTTP-only cookie.
 
-    Returns:
-    - dict: Dictionary containing authentication token and message.
+    Parameters:
+    - db (db_dependency): The database session.
+    - user (UserCredentials, required): The user credentials containing email and password.
+    - response (Response): The response object to set cookies.
+
+    Request Body Example:
+    {
+        "email": "user@example.com",
+        "password": "userpassword"
+    }
+
+    Responses:
+    - 200 OK: Returns the JWT token and a success message if login is successful.
+    - 400 Bad Request: If the email is not found or the password is incorrect.
+
+    Example:
+    POST /user/login
+    {
+        "email": "user@example.com",
+        "password": "userpassword"
+    }
     """
     db_user = get_user_by_email(db, email = user.email)
     if not db_user:
@@ -103,19 +95,37 @@ async def login_user(db:db_dependency, user: UserCredentials, response: Response
     return {"token": decoded_token, "code": "login succeed."}
 
 
-# POST url/user
 @router.post("", status_code=status.HTTP_201_CREATED)
-async def add_user(db: db_dependency, user: UserCreate, response: Response):
+async def create_user(db: db_dependency, user: UserCreate, response: Response):
     """
-    Endpoint to add a new user to the database.
+    Register a new user.
 
-    Args:
-    - user (UserCreate): User data including email, password, etc.
-    - response (Response): FastAPI Response object to set cookie.
-    - db (Session): Database session dependency.
+    This endpoint allows a new user to register by providing their email and other necessary details. 
+    If the registration is successful, a JWT token is issued and set as an HTTP-only cookie.
 
-    Returns:
-    - dict: Dictionary containing authentication token and message.
+    Parameters:
+    - db (db_dependency): The database session.
+    - user (UserCreate, required): The user data for registration.
+    - response (Response): The response object to set cookies.
+
+    Request Body Example:
+    {
+        "email": "newuser@example.com",
+        "password": "newuserpassword",
+        "username": "newuser"
+    }
+
+    Responses:
+    - 201 Created: Returns the JWT token and a success message if registration is successful.
+    - 400 Bad Request: If the email is already in use.
+
+    Example:
+    POST /user
+    {
+        "email": "newuser@example.com",
+        "password": "newuserpassword",
+        "username": "newuser"
+    }
     """
     db_user = get_user_by_email(db, email = user.email)
     if db_user: # User email existiert bereits
