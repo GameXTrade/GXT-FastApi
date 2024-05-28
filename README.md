@@ -1,11 +1,16 @@
 # GameXTrade [Backend API](https://v2202405172564268947.bestsrv.de/docs)
 
-## run localy
+## Run localy without Docker
 
 If you are not using Docker, make sure your config file is mostly filled out.
 
-- command without docker
+- installation command where requirements.txt is located
+  `pip install --no-cache-dir --upgrade pip -r requirements.txt`
+
+- run command where main.py is located
   `uvicorn app.main:app --host localhost --port 8000  --reload`
+
+## Run localy with Docker
 
 ### Edit Dockerfile
 
@@ -85,3 +90,12 @@ services:
 networks:
 webnet:
 ```
+
+### start
+
+- run commandline where docker-compose.yml is located
+  `docker compose up -d`
+
+### end
+
+- ... `docker compose down`
