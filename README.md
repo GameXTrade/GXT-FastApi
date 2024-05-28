@@ -1,11 +1,11 @@
 # GameXTrade [Backend API](https://v2202405172564268947.bestsrv.de/docs)
 
-## How To run localy
+## run localy
 
-make sure your config file is mostly filled out.
-``
+If you are not using Docker, make sure your config file is mostly filled out.
 
-## How To install localy
+- command without docker
+  `uvicorn app.main:app --host localhost --port 8000  --reload`
 
 ### Edit Dockerfile
 
