@@ -32,7 +32,7 @@ async def get_items(db: db_dependency, request: Request, skip: int = 0, limit: i
     - default: An error message if the request fails.
     """
     client_host = request.client.host
-    print(client_host)
+    # print(client_host)
     db_items = get_all_items(db, skip, limit)
     return db_items
 
