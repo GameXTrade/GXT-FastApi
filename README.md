@@ -5,10 +5,11 @@
 If you are not using Docker, make sure your config file is mostly filled out.
 
 - installation command where requirements.txt is located
-  `pip install --no-cache-dir --upgrade pip -r requirements.txt`
 
-- run command where main.py is located
-  `uvicorn app.main:app --host localhost --port 8000  --reload`
+  - `pip install --no-cache-dir --upgrade pip -r requirements.txt`
+
+- run command when environment is activated
+  - `uvicorn app.main:app --host localhost --port 8000  --reload`
 
 ## Run localy with Docker
 
