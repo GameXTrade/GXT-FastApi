@@ -67,7 +67,7 @@ environment:
 POSTGRES_USER: <PostgresUsername>
 POSTGRES_PASSWORD: <PostgresUserPassword>
 POSTGRES_DB: fastapi
-ports: - "5433:5432"
+ports: - "5432:5432"
 volumes: - <PathWhereToStoreDatabase>:/var/lib/postgresql/data
 networks: - webnet
 
