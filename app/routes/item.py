@@ -8,10 +8,14 @@ from app.database.db import db_dependency
 # from app.operations.auth import authenticate_route
 
 
+from fastapi_limiter.depends import RateLimiter
+
+
 router = APIRouter(
     prefix="/item", 
     tags=['item']
 )
+
 
 @router.get("/all")
 async def get_items(db: db_dependency, request: Request, skip: int = 0, limit: int = 100):
@@ -55,7 +59,7 @@ async def ten_recently_added_items(db: db_dependency, request: Request):
     print(client_host)
     return get_10_recently_added_items(db)
 
-@router.get("/{item_id}")
+@router.get("/{item_id}", dependencies=[Depends(RateLimiter(times=1, seconds=1))])
 async def get_item(db: db_dependency, item_id:int, request: Request):
     """
     Retrieve an item by its ID.
@@ -75,6 +79,7 @@ async def get_item(db: db_dependency, item_id:int, request: Request):
     """
     client_host = request.client.host
     item = get_item_by_id(db, item_id)
+    print(item)
     if item is None:
         return {"error": "Item not found"}
     return item

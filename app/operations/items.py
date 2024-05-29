@@ -8,16 +8,6 @@ def get_items_by_user_id(db:Session, user_id: int, skip: int = 0, limit: int = 1
     return db.query(model.Item).filter(model.Item.owner_id == user_id).offset(skip).limit(limit).all()
 
 def get_10_recently_added_items(db:Session):
-    """
-    Retrieve the 10 most recently added items from the database.
-
-    Parameters:
-        db (Session): A SQLAlchemy session to access the database.
-
-    Returns:
-        list: A list of dictionaries containing information about the 10 most recently added items.
-              Each dictionary contains the attributes of the items along with the owner's username under 'owner_name'.
-    """
     query = db.query(model.Item, model.User.username).\
             join(model.User, model.Item.owner_id == model.User.id).\
             filter(model.Item.activated == True).\
@@ -31,23 +21,22 @@ def get_10_recently_added_items(db:Session):
     return results
 
 def get_item_by_id(db: Session, item_id: int):
-    # Erstelle die Abfrage und filtere nach der item_id
     query = db.query(model.Item, model.User.username).\
         join(model.User, model.Item.owner_id == model.User.id).\
         filter(model.Item.item_id == item_id)
     
-    # Hol das erste Ergebnis
-    result = query.first()
-    
-    if result:
-        item, username = result
+    results = []
+    for item, username in query:
+        item.views += 1
         item_dict = item.__dict__.copy()
         item_dict['owner_name'] = username
-        # Entferne SQLAlchemy-spezifische Attribute
-        item_dict.pop('_sa_instance_state', None)
-        return item_dict
+        results.append(item_dict)
     
-    return None
+    if results:
+        db.commit() 
+    
+    return results
+
 
 def get_all_items(db:Session,skip: int = 0, limit: int = 100):
     query = db.query(model.Item, model.User.username).\
@@ -67,7 +56,7 @@ def create_item(db:Session, item: ItemCreate, user_id: int):
         name = item.name, antiflag = item.antiflag, 
         link= item.link, type = item.type, imagelink = item.imagelink, 
         owner_id = user_id, price = item.price, wearable = item.wearable,
-        download_count = 0
+        download_count = 0, views = 0
     )
     db.add(db_item)
     db.commit()

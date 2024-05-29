@@ -3,7 +3,7 @@ from app.routes.item import router as item_router
 from app.routes.user import router as user_router
 # from app.routes.mailer import router as mail_route
 # from app.routes.game import router as game_router
-from app.routes.token import router as token_router
+# from app.routes.token import router as token_router
 
 
 
@@ -12,13 +12,14 @@ from app.database.db import Base, engine, SessionLocal
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from starlette.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, Request
+from fastapi import FastAPI#, Request,UploadFile
 from contextlib import asynccontextmanager
-from app.factory.upload_google_drive import GoogleDriveFactory
+# from app.factory.upload_google_drive import GoogleDriveFactory
 
 
-from fastapi import UploadFile
 
+import redis.asyncio as redis
+from fastapi_limiter import FastAPILimiter
 
 def reset_sequences(db: Session):
     """
@@ -61,8 +62,15 @@ async def lifespan(app: FastAPI):
     db = SessionLocal()
     try:
         reset_sequences(db)
+        print("reset_sequences method executed")
+        
+        redis_connection = redis.from_url("redis://redis:6379", encoding="utf8")
+        await FastAPILimiter.init(redis_connection)
+        print("FastAPILimiter initialized")
         yield
+
     finally:
+        await FastAPILimiter.close()
         db.close()
 
 app = FastAPI(lifespan=lifespan)
