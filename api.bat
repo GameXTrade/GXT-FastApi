@@ -11,7 +11,7 @@ rem Stoppen Sie die Docker-Container
 :stop
 if "%1"=="stop" (
     docker compose down
-    docker rmi imagename
+    docker rmi fastapi:latest
     exit /b
 )
 

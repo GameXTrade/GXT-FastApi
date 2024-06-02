@@ -1,7 +1,15 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Response, status
 from app.operations.token import Token, check_request_token
 from app.schemas.item_schema import ItemCreate
-from app.operations.items import create_item, get_items_by_user_id, get_all_items, get_10_recently_added_items, get_item_by_id
+from app.operations.items import (
+    create_item,
+    get_items_by_user_id,
+    get_all_items,
+    get_10_recently_added_items,
+    get_item_by_id,
+    update_downloadcount,
+)
+
 from app.database.db import db_dependency
 
 # only when payload is no used
@@ -55,8 +63,7 @@ async def ten_recently_added_items(db: db_dependency, request: Request):
     - 200 OK: Returns a list of the 10 most recently added items.
     - default: An error message if the request fails.
     """
-    client_host = request.client.host
-    print(client_host)
+    # client_host = request.client.host
     return get_10_recently_added_items(db)
 
 @router.get("/{item_id}", dependencies=[Depends(RateLimiter(times=1, seconds=1))])
@@ -77,9 +84,9 @@ async def get_item(db: db_dependency, item_id:int, request: Request):
     - 404 Not Found: If the item with the specified ID does not exist.
     - default: An error message if the request fails.
     """
-    client_host = request.client.host
+    # client_host = request.client.host
     item = get_item_by_id(db, item_id)
-    print(item)
+    # print(item)
     if item is None:
         return {"error": "Item not found"}
     return item
@@ -144,3 +151,8 @@ async def get_user_items(
     """
     db_items = get_items_by_user_id(db, user_id=token_data["sub"], skip=skip, limit=limit)
     return db_items
+
+@router.post("/download_count/{item_id}", dependencies=[Depends(RateLimiter(times=1, seconds=1))])
+async def increment_download_count(db: db_dependency, item_id:int, request: Request):
+    update_downloadcount(db, item_id)
+    return Response(status_code = status.HTTP_200_OK)

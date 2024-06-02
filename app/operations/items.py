@@ -37,6 +37,11 @@ def get_item_by_id(db: Session, item_id: int):
     
     return results
 
+def update_downloadcount(db:Session, item_id: int)->None:
+    item = db.query(model.Item).filter(model.Item.item_id == item_id).first()
+    if item:
+        item.download_count += 1
+        db.commit()
 
 def get_all_items(db:Session,skip: int = 0, limit: int = 100):
     query = db.query(model.Item, model.User.username).\

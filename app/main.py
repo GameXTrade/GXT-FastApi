@@ -6,7 +6,6 @@ from app.routes.user import router as user_router
 # from app.routes.token import router as token_router
 
 
-
 # # database models
 from app.database.db import Base, engine, SessionLocal
 from sqlalchemy.orm import Session
