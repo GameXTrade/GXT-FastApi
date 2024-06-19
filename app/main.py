@@ -15,7 +15,6 @@ from fastapi import FastAPI#, Request,UploadFile
 from contextlib import asynccontextmanager
 # from app.factory.upload_google_drive import GoogleDriveFactory
 
-from app.services.config import SECRET_KEY, ALGORITHM
 
 import redis.asyncio as redis
 from fastapi_limiter import FastAPILimiter
@@ -112,5 +111,3 @@ def index():
 #     file_url = save_file.share_file(file_id)
 #     print("file_id", file_id, "filename", file_upload.filename, "file_url", file_url)
 #     return {"file_id": file_id, "filename": file_upload.filename, "file_url": file_url}
-
-print(SECRET_KEY, ALGORITHM)
