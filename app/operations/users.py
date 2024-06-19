@@ -17,7 +17,7 @@ def get_users(db:Session, skip: int = 0, limit: int = 100):
 
 
 # CREATE USER
-def create_user(db:Session, user: UserCreate): 
+def create_new_user(db:Session, user: UserCreate): 
     hashpassword = generate_hash_password(user.password)
     db_user = model.User(username = user.username, email = user.email, image = user.image, hashedpassword = hashpassword)
     db.add(db_user)

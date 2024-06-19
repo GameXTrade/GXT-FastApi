@@ -8,6 +8,7 @@ from app.operations.items import (
     get_10_recently_added_items,
     get_item_by_id,
     update_downloadcount,
+    get_user_item2
 )
 
 from app.database.db import db_dependency
@@ -121,7 +122,7 @@ async def add_item_to_db(
     """
     token_payload = Token(**token_data) 
  
-    db_item = create_item(db, item , user_id= token_payload.sub)
+    db_item = create_item(db, item, user_id= token_payload.sub)
     return db_item
 
 @router.get("")
@@ -156,3 +157,8 @@ async def get_user_items(
 async def increment_download_count(db: db_dependency, item_id:int, request: Request):
     update_downloadcount(db, item_id)
     return Response(status_code = status.HTTP_200_OK)
+
+
+@router.get("/getuser_items")
+async def test(db: db_dependency, user_id: int):
+    return get_user_item2(db, user_id)

@@ -2,7 +2,7 @@ from app.services.mailer import send_mail
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from app.schemas.user_schema import UserCreate
 from app.database.db import db_dependency
-from app.operations.users import create_user, get_users,delete_user, get_user_by_email, verify_user_id
+from app.operations.users import create_new_user, get_users,delete_user, get_user_by_email, verify_user_id
 from app.operations.token import create_token, check_token, Token, TokenRequest
 from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
@@ -151,7 +151,7 @@ async def create_user(db: db_dependency, user: UserCreate, response: Response):
     db_user = get_user_by_email(db, email = user.email)
     if db_user: # User email existiert bereits
         raise HTTPException(status_code=400, detail="not allowed to use this email")
-    db_user = create_user(db, user)
+    db_user = create_new_user(db, user)
 
     token = create_token(db_user.id, db_user.username, db_user.is_verified, db_user.image)
     _, decoded_token = check_token(token)

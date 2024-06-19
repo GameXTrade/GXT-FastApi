@@ -4,16 +4,16 @@ from enum import Enum
 
 
 class Item(BaseModel):
-    name: str
-    # creator: str
-    antiflag: int
-    link: str
-    type: int
-    imagelink: Optional[str] = None
-    wearable: int
-    price: float
 
-    # download_count: int
+    name: str
+    type: int
+    subtype: int
+    antiflag: int
+
+    imagelink: str = Field(default = '')
+    link: str = Field(default = '')
+    
+    price: float = Field(default = 0.0)
 
 class ItemCreate(Item):
     ...

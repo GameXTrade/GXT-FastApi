@@ -24,24 +24,23 @@ class Item(Base):
     __tablename__ = "items"
     
     item_id = Column(Integer, primary_key=True)
-    
     name = Column(String, unique=True)
+    item_type = Column(Integer)
+    item_subtype = Column(Integer)
     antiflag = Column(Integer)
-    link = Column(String)
-    type = Column(Integer)
-    wearable = Column(Integer)
-    imagelink = Column(String)
+    
+    image_link = Column(String)
+    download_link = Column(String)
 
     price = Column(Numeric(precision=10, scale=2), nullable=False, default=0.00)
 
     download_count = Column(Integer, nullable=False, default = 0)
-
     views = Column(Integer, nullable=False, default = 0)
-    # description = Column(String)
+
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     
-    activated = Column(Boolean, default=False)
+    status = Column(Boolean, default=False)
 
     owner = relationship("User", back_populates="items") 
 
