@@ -7,6 +7,8 @@ from app.operations.items import (
     get_all_items,
     get_10_recently_added_items,
     get_item_by_id,
+    get_10_notable_items,
+    get_10_most_downloaded_items_for_day,
     update_downloadcount,
     get_user_item2
 )
@@ -26,7 +28,7 @@ router = APIRouter(
 )
 
 
-@router.get("/all")
+@router.get("/all", dependencies=[Depends(RateLimiter(times=1, seconds=1))])
 async def get_items(db: db_dependency, request: Request, skip: int = 0, limit: int = 100):
     """
     Retrieve all items.
@@ -50,7 +52,7 @@ async def get_items(db: db_dependency, request: Request, skip: int = 0, limit: i
     return db_items
 
 
-@router.get("/recent")
+@router.get("/recent", dependencies=[Depends(RateLimiter(times=1, seconds=1))])
 async def ten_recently_added_items(db: db_dependency, request: Request):
     """
     Retrieve the 10 most recently added items.
@@ -66,6 +68,14 @@ async def ten_recently_added_items(db: db_dependency, request: Request):
     """
     # client_host = request.client.host
     return get_10_recently_added_items(db)
+
+@router.get("/notables", dependencies=[Depends(RateLimiter(times=1, seconds=1))])
+async def ten_top_notable_items(db: db_dependency, request: Request):
+    return get_10_notable_items(db)
+
+@router.get("/top_downloaded_day", dependencies=[Depends(RateLimiter(times=1, seconds=1))])
+async def ten_top_downloaded_in_day(db: db_dependency, request: Request):
+    return get_10_most_downloaded_items_for_day(db)
 
 @router.get("/{item_id}", dependencies=[Depends(RateLimiter(times=1, seconds=1))])
 async def get_item(db: db_dependency, item_id:int, request: Request):
@@ -85,15 +95,13 @@ async def get_item(db: db_dependency, item_id:int, request: Request):
     - 404 Not Found: If the item with the specified ID does not exist.
     - default: An error message if the request fails.
     """
-    # client_host = request.client.host
     item = get_item_by_id(db, item_id)
-    # print(item)
     if item is None:
         return {"error": "Item not found"}
     return item
 
 
-@router.post("/create")
+@router.post("/create", dependencies=[Depends(RateLimiter(times=1, seconds=1))])
 async def add_item_to_db(
     db: db_dependency, 
     item: ItemCreate, 

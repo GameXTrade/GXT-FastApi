@@ -1,9 +1,9 @@
 from app.schemas.item_schema import ItemCreate
 from app.models import model
 from sqlalchemy.orm import Session
-from sqlalchemy import desc, text
+from sqlalchemy import desc, text, and_
 from pydantic import BaseModel
-
+from datetime import datetime, timedelta
 
 def get_items_by_user_id(db:Session, user_id: int, skip: int = 0, limit: int = 100):   
     return db.query(model.Item).filter(model.Item.owner_id == user_id).offset(skip).limit(limit).all()
@@ -13,6 +13,47 @@ def get_10_recently_added_items(db:Session):
             join(model.User, model.Item.owner_id == model.User.id).\
             filter(model.Item.status == True).\
             order_by(desc(model.Item.created_at)).limit(10).all()
+    results = []
+    for item, username in query:
+        item_dict = item.__dict__
+        item_dict['owner_name'] = username
+        results.append(item_dict)
+
+    return results
+
+def get_10_notable_items(db:Session):
+    query = db.query(model.Item, model.User.username) \
+        .join(model.User, model.Item.owner_id == model.User.id) \
+        .filter(model.Item.status == True) \
+        .order_by(desc(model.Item.views), model.Item.download_count) \
+        .limit(10) \
+        .all()
+    
+    results = []
+    for item, username in query:
+        item_dict = item.__dict__
+        item_dict['owner_name'] = username
+        results.append(item_dict)
+
+    return results
+
+def get_10_most_downloaded_items_for_day(db:Session):
+
+    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    start_of_day = today.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_of_day = start_of_day + timedelta(days=1)
+
+    query = db.query(model.Item, model.User.username) \
+        .join(model.User, model.Item.owner_id == model.User.id) \
+        .filter(model.Item.status == True) \
+        .filter(and_(
+            model.Item.created_at >= start_of_day,
+            model.Item.created_at < end_of_day
+        )) \
+        .order_by(desc(model.Item.download_count)) \
+        .limit(10) \
+        .all()
+    
     results = []
     for item, username in query:
         item_dict = item.__dict__
