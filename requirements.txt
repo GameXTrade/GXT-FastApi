@@ -59,7 +59,7 @@ SQLAlchemy==2.0.29
 starlette==0.37.2
 typing_extensions==4.10.0
 uritemplate==4.1.1
-urllib3==2.2.1
+urllib3==2.2.2
 uvicorn==0.29.0
 watchfiles==0.21.0
 websockets==12.0
