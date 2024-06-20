@@ -1,9 +1,9 @@
-from app.schemas.item_schema import ItemCreate
+from app.schemas.item_schema import ItemCreate, DownloadEntrie
 from app.models import model
 from sqlalchemy.orm import Session
-from sqlalchemy import desc, text, and_
+from sqlalchemy import desc, text, and_,func
 from pydantic import BaseModel
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 def get_items_by_user_id(db:Session, user_id: int, skip: int = 0, limit: int = 100):   
     return db.query(model.Item).filter(model.Item.owner_id == user_id).offset(skip).limit(limit).all()
@@ -37,27 +37,31 @@ def get_10_notable_items(db:Session):
 
     return results
 
-def get_10_most_downloaded_items_for_day(db:Session):
+def get_10_most_downloaded_items_for_day(db: Session):
+    # Start des heutigen Tages (00:00:00)
+    start_of_day = datetime.combine(date.today(), datetime.min.time())
+    
+    # Ende des aktuellen Zeitpunkts
+    end_of_day = datetime.now()
 
-    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    start_of_day = today.replace(hour=0, minute=0, second=0, microsecond=0)
-    end_of_day = start_of_day + timedelta(days=1)
-
-    query = db.query(model.Item, model.User.username) \
+    query = db.query(model.Item, model.User.username, func.count(model.Download.id).label('download_count')) \
         .join(model.User, model.Item.owner_id == model.User.id) \
-        .filter(model.Item.status == True) \
-        .filter(and_(
-            model.Item.created_at >= start_of_day,
-            model.Item.created_at < end_of_day
+        .outerjoin(model.Download, and_(
+            model.Download.item_id == model.Item.item_id,
+            model.Download.download_timestamp >= start_of_day,
+            model.Download.download_timestamp <= end_of_day
         )) \
-        .order_by(desc(model.Item.download_count)) \
+        .filter(model.Item.status == True) \
+        .group_by(model.Item.item_id, model.User.username) \
+        .order_by(desc(func.count(model.Download.id))) \
         .limit(10) \
         .all()
     
     results = []
-    for item, username in query:
+    for item, username, download_count in query:
         item_dict = item.__dict__
         item_dict['owner_name'] = username
+        item_dict['download_count'] = download_count
         results.append(item_dict)
 
     return results
@@ -79,11 +83,23 @@ def get_item_by_id(db: Session, item_id: int):
     
     return results
 
-def update_downloadcount(db:Session, item_id: int)->None:
+def update_downloadcount(db: Session, item_id: int) -> None:
     item = db.query(model.Item).filter(model.Item.item_id == item_id).first()
     if item:
-        item.download_count += 1
+        download_count = db.query(model.Download).filter(model.Download.item_id == item_id).count()
+        item.download_count = download_count
         db.commit()
+
+def insert_into_downloads(db: Session, download_model: DownloadEntrie):
+    download_item = model.Download(
+        item_id = download_model.item_id, 
+        client = download_model.client,
+        referer_url = download_model.referer_url,
+        browser = download_model.browser
+)
+    db.add(download_item)
+    db.commit()
+    db.refresh(download_item)
 
 def get_all_items(db:Session,skip: int = 0, limit: int = 100):
     query = db.query(model.Item, model.User.username).\

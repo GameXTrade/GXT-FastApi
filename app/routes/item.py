@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Request, Response, status
+from pydantic import BaseModel
 from app.operations.token import Token, check_request_token
-from app.schemas.item_schema import ItemCreate
+from app.schemas.item_schema import ItemCreate, DownloadEntrie
 from app.operations.items import (
     create_item,
     get_items_by_user_id,
@@ -10,6 +11,7 @@ from app.operations.items import (
     get_10_notable_items,
     get_10_most_downloaded_items_for_day,
     update_downloadcount,
+    insert_into_downloads,
     get_user_item2
 )
 
@@ -161,8 +163,20 @@ async def get_user_items(
     db_items = get_items_by_user_id(db, user_id=token_data["sub"], skip=skip, limit=limit)
     return db_items
 
+
+
 @router.post("/download_count/{item_id}", dependencies=[Depends(RateLimiter(times=1, seconds=1))])
 async def increment_download_count(db: db_dependency, item_id:int, request: Request):
+    client_ip = request.client.host
+    download_model = DownloadEntrie(
+        item_id = item_id, 
+        client = client_ip,
+        referer_url = request.headers.get('referer'),
+        browser = request.headers.get('user-agent')
+    )
+    # ADD download entrie in downloads table
+    insert_into_downloads(db, download_model)
+    # SUMM all entries from download table and save it to item.download_count
     update_downloadcount(db, item_id)
     return Response(status_code = status.HTTP_200_OK)
 

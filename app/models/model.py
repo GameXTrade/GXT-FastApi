@@ -4,9 +4,6 @@ from sqlalchemy.sql import func
 from sqlalchemy import TIMESTAMP
 from app.database.db import Base
 
-
-
-
 class User(Base):
     __tablename__ = "users"
 
@@ -43,4 +40,19 @@ class Item(Base):
     status = Column(Boolean, default=False)
 
     owner = relationship("User", back_populates="items") 
+    downloads = relationship("Download", back_populates="item")
 
+class Download(Base):
+    __tablename__ = "downloads"
+    id = Column(Integer, primary_key=True, index=True)
+    item_id = Column(Integer, ForeignKey('items.item_id'), nullable=False)
+
+    referer_url = Column(String, nullable=True)
+    browser = Column(String, nullable=True)
+
+    client = Column(String, nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+
+    download_timestamp = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
+
+    item = relationship("Item", back_populates="downloads")

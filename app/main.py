@@ -44,7 +44,8 @@ def reset_sequences(db: Session):
     """
     tables_and_sequences = [
         ("items", "item_id", "items_item_id_seq"),
-        ("users", "id", "users_id_seq")
+        ("users", "id", "users_id_seq"),
+        ("downloads", "id", "downloads_id_seq")
     ]
     
     for table, column, sequence in tables_and_sequences:

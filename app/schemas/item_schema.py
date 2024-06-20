@@ -17,3 +17,9 @@ class Item(BaseModel):
 
 class ItemCreate(Item):
     ...
+
+class DownloadEntrie(BaseModel):
+    item_id: int
+    client: str
+    referer_url: str
+    browser: str
