@@ -167,7 +167,13 @@ async def get_user_items(
 
 @router.post("/download_count/{item_id}", dependencies=[Depends(RateLimiter(times=1, seconds=1))])
 async def increment_download_count(db: db_dependency, item_id:int, request: Request):
-    client_ip = request.client.host
+    client_ip = request.headers.get('X-Forwarded-For')
+    if client_ip:
+        # Falls mehrere IP-Adressen im Header vorhanden sind, die erste IP-Adresse ist die tatsächliche IP-Adresse des Nutzers
+        client_ip = client_ip.split(",")[0]
+    else:
+        client_ip = request.client.host
+        
     download_model = DownloadEntrie(
         item_id = item_id, 
         client = client_ip,
